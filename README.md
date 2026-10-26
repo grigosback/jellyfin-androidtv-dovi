@@ -1,3 +1,43 @@
+<h1 align="center">RemuxDV</h1>
+<h3 align="center">An unofficial Jellyfin client for Android TV that plays Dolby Vision profile 7 remuxes</h3>
+
+---
+
+RemuxDV is a fork of [Jellyfin for Android TV](https://github.com/jellyfin/jellyfin-androidtv). It is not
+affiliated with or endorsed by the Jellyfin project or Dolby Laboratories.
+
+UHD Blu-ray remuxes use Dolby Vision profile 7 (a base layer plus an enhancement layer). Most Android TV
+Dolby Vision decoders only support single layer profiles, so the official app makes the server remux these
+files and strip the Dolby Vision metadata, leaving plain HDR10. RemuxDV converts them on the device instead,
+the same way Kodi does with "convert Dolby Vision":
+
+- every Dolby Vision RPU is converted to profile 8.1 with [libdovi](https://github.com/quietvoid/dovi_tool)
+  (mode 2) and the enhancement layer is dropped, right before each frame reaches the decoder
+- the server direct plays the file as is, so there is no remux or transcode
+- HDR10+ metadata of hybrid releases is removed while the Dolby Vision decoder is used, so TVs that prefer
+  HDR10+ stay in Dolby Vision mode
+- DTS and TrueHD audio are decoded on the device when they can't be passed through, instead of triggering a
+  server remux
+
+Devices with a native profile 7 decoder keep the original stream. A full enhancement layer (FEL) is
+discarded, as with Kodi; minimal enhancement layer (MEL) files lose nothing.
+
+### Install
+
+Download the APK from [Releases](https://github.com/grigosback/jellyfin-androidtv-dovi/releases) and sideload
+it (for example with adb or an app like "Send Files to TV"). It installs next to the official app.
+
+### Build
+
+- Dolby Vision conversion library (Rust, needs rustup with the Android targets, cargo-ndk and the NDK):
+  `dovi-jni/build-android.sh`. Prebuilt libraries are committed.
+- App: `./gradlew :app:assembleDebug`, or `scripts/build-release.sh <version>` for a signed release.
+- Branding: `python3 branding/generate.py` regenerates the icon, banner and logo.
+
+The rest of this file is the upstream README.
+
+---
+
 <h1 align="center">Jellyfin for Android TV</h1>
 <h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
 
