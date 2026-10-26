@@ -10,6 +10,7 @@ import org.jellyfin.androidtv.preference.constant.BitstreamAudioMode
 import org.jellyfin.androidtv.preference.constant.HdrFormat
 import org.jellyfin.androidtv.preference.constant.HdrOverrideMode
 import org.jellyfin.androidtv.util.profile.codec.isPassthroughAudioAvailable
+import org.jellyfin.playback.media3.exoplayer.dovi.DoviNative
 import org.jellyfin.sdk.model.ServerVersion
 import org.jellyfin.sdk.model.api.CodecType
 import org.jellyfin.sdk.model.api.DlnaProfileType
@@ -132,8 +133,8 @@ fun createDeviceProfile(
 		when (supportedPassthroughAudioCodecs) {
 			Codec.Audio.AC3 -> isAC3PrefEnabled
 			Codec.Audio.EAC3 -> isEAC3PrefEnabled
-			Codec.Audio.TRUEHD -> isTrueHDPrefEnabled
-			Codec.Audio.DTS -> isDTSPrefEnabled
+			// DTS and TrueHD are decoded by the bundled FFmpeg extension when they can't be passed through
+			Codec.Audio.TRUEHD, Codec.Audio.DTS -> true
 			else -> true
 		}
 	}.toTypedArray()
@@ -482,7 +483,7 @@ fun createDeviceProfile(
 
 		if (!supportsHevcDolbyVisionEL) {
 			if (
-				!KnownDefects.unreportedDoviProfile7Support ||
+				!(KnownDefects.unreportedDoviProfile7Support || DoviNative.isAvailable) ||
 				!supportsHevcDolbyVision ||
 				!supportsHevcMain10 ||
 				!supportsHevcHDR10
