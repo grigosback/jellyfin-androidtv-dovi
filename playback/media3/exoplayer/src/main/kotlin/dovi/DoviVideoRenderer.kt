@@ -18,7 +18,8 @@ import timber.log.Timber
  * A [MediaCodecVideoRenderer] that plays Dolby Vision profile 7 (dual layer, as found on UHD
  * Blu-ray remuxes) on decoders that only support profile 8, like Kodi's "convert Dolby Vision"
  * option: the track is announced to the decoder as profile 8.1 and every sample is rewritten by
- * [DoviNative] before it is queued.
+ * [DoviNative] before it is queued. HDR10+ metadata of hybrid releases is removed while the Dolby
+ * Vision decoder is used.
  *
  * Devices with a real profile 7 decoder keep the original stream.
  */
@@ -49,7 +50,10 @@ class DoviVideoRenderer(builder: Builder) : MediaCodecVideoRenderer(builder) {
 	override fun onQueueInputBuffer(buffer: DecoderInputBuffer) {
 		val data = buffer.data
 		if (convertSamples && data != null && data.isDirect && !data.isReadOnly && data.position() == 0) {
-			val length = DoviNative.rewriteSample(data, data.limit(), data.capacity())
+			// Hybrid HDR10+ releases make some TVs leave Dolby Vision mode, so drop HDR10+ while the
+			// Dolby Vision decoder is used. A plain HEVC fallback decoder keeps it.
+			val removeHdr10Plus = codecInfo?.mimeType == MimeTypes.VIDEO_DOLBY_VISION
+			val length = DoviNative.rewriteSample(data, data.limit(), data.capacity(), removeHdr10Plus)
 			if (length >= 0) data.limit(length)
 		}
 		super.onQueueInputBuffer(buffer)

@@ -19,9 +19,10 @@ object DoviNative {
 
 	/**
 	 * Rewrites the first [length] bytes of the direct [buffer] (an Annex-B access unit) in place.
+	 * HDR10+ metadata is removed as well when [removeHdr10Plus] is set.
 	 *
 	 * @return the new length, or -1 when the buffer was left untouched.
 	 */
 	@JvmStatic
-	external fun rewriteSample(buffer: ByteBuffer, length: Int, capacity: Int): Int
+	external fun rewriteSample(buffer: ByteBuffer, length: Int, capacity: Int, removeHdr10Plus: Boolean): Int
 }

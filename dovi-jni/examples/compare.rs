@@ -28,8 +28,11 @@ fn main() {
 	let input = std::fs::read(&args[1]).unwrap();
 	let reference = std::fs::read(&args[2]).unwrap();
 	let t = std::time::Instant::now();
-	let ours = dovi_jni::rewrite_annexb(&input).expect("nothing rewritten");
+	let ours = dovi_jni::rewrite_annexb(&input, std::env::var("STRIP_HDR10PLUS").is_ok()).expect("nothing rewritten");
 	let elapsed = t.elapsed();
+	if let Ok(path) = std::env::var("OUT") {
+		std::fs::write(path, &ours).unwrap();
+	}
 	let (a, b) = (nals(&ours), nals(&reference));
 	let count = |v: &Vec<&[u8]>, t: u8| v.iter().filter(|n| (n[0] >> 1) & 0x3f == t).count();
 	println!("input {} bytes -> ours {} bytes in {:?}", input.len(), ours.len(), elapsed);
