@@ -36,10 +36,10 @@ fun SettingsAboutScreen(launchedFromLogin: Boolean = false) {
 		}
 
 		item {
-			val heading = "Jellyfin app version"
-			val caption = "jellyfin-androidtv ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}"
+			val heading = "RemuxDV version"
+			val caption = "remuxdv ${BuildConfig.VERSION_NAME} ${BuildConfig.BUILD_TYPE}"
 			ListButton(
-				leadingContent = { Icon(painterResource(R.drawable.ic_jellyfin), contentDescription = null) },
+				leadingContent = { Icon(painterResource(R.drawable.ic_remuxdv), contentDescription = null) },
 				headingContent = { Text(heading) },
 				captionContent = { Text(caption) },
 				onClick = copyAction(ClipData.newPlainText(heading, caption)),

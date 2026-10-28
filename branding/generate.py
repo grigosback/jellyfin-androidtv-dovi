@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates the RemuxDV launcher icon, TV banner and logo.
+"""Generates the RemuxDV launcher icon, TV banner, logo and settings icon.
 
 The mark is two offset rounded squares (the base and enhancement layers the app merges) with a
 play triangle. Text is converted to paths from Noto Sans Bold (SIL Open Font License).
@@ -171,7 +171,13 @@ def main():
 	# Logo used in the toolbar, splash screen and screensaver: 252 x 72
 	logo_mark_scale, logo_size = 1.3, 38
 	logo = wordmark(text, (252 - wordmark_width(text, logo_mark_scale, logo_size)) / 2, 36, 72, logo_mark_scale, logo_size)
-	(RES / "drawable/app_logo.xml").write_text(vector_xml(252, 72, logo))
+	# Upstream keeps a drawable-v24 copy, which wins on every device the app supports
+	for folder in ("drawable", "drawable-v24"):
+		(RES / f"{folder}/app_logo.xml").write_text(vector_xml(252, 72, logo))
+
+	# Settings icon (tinted by the UI): 24 x 24 with the mark scaled to fit
+	settings_icon = mark(12 - MARK_W / 4, 12 - MARK_H / 4, 0.5, monochrome=True)
+	(RES / "drawable/ic_remuxdv.xml").write_text(vector_xml(24, 24, settings_icon))
 
 	# Legacy (API < 26) icon and the TV banner PNGs; the icon shows the adaptive icon's visible 72 dp
 	icon_sizes = {"mdpi": 80, "hdpi": 120, "xhdpi": 160, "xxhdpi": 240, "xxxhdpi": 320}
